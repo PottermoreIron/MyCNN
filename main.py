@@ -1,16 +1,19 @@
-# This is a sample Python script.
+import os
+import torchvision
+from torch.utils.data import Dataset, DataLoader
+from torch.optim import Adam
+import torch.nn as nn
+from model import CNN
+import config
+from train import train
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+if os.path.exists("minist"):
+    DOWNLOAD_DATA = False
+train_data = torchvision.datasets.MNIST(root='./minist/train', transform=torchvision.transforms.ToTensor(), train=True,
+                                        download=config.DOWNLOAD_DATA)
+# test_data = torchvision.datasets.MNIST(root='./minist/test', train=False)
+train_loader = DataLoader(dataset=train_data, batch_size=config.BATCH_SIZE, shuffle=True)
+cnn = CNN()
+optimizer = Adam(cnn.parameters(), lr=config.LR)  # optimize all cnn parameters
+loss_func = nn.CrossEntropyLoss()
+train(train_loader, config.EPOCH, cnn, loss_func, optimizer)
